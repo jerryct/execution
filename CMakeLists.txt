@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(execution CXX)
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS Off)
 set(DEFAULT_COPTS "-fno-omit-frame-pointer" "-g") # "-fno-builtin-memcpy" "-U_FORTIFY_SOURCE"
 
@@ -50,6 +50,7 @@ add_library(execution
   intrusive_forward_list.h
   invoke_traits.h
   sync_wait.h
+  tag_invoke.h
   then.h
   thread_pool.h
 )
@@ -64,6 +65,7 @@ add_executable(unit_tests
   bulk_tests.cpp
   intrusive_forward_list_tests.cpp
   invoke_traits_tests.cpp
+  tag_invoke_tests.cpp
   then_tests.cpp
 )
 target_link_libraries(unit_tests PRIVATE execution gtest_main)

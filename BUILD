@@ -7,6 +7,7 @@ cc_library(
         "intrusive_forward_list.h",
         "invoke_traits.h",
         "sync_wait.h",
+        "tag_invoke.h",
         "then.h",
         "thread_pool.h",
     ],
@@ -24,6 +25,7 @@ cc_test(
         "bulk_tests.cpp",
         "intrusive_forward_list_tests.cpp",
         "invoke_traits_tests.cpp",
+        "tag_invoke_tests.cpp",
         "then_tests.cpp",
     ],
     deps = [
