@@ -31,11 +31,12 @@ template <typename T> struct promise {
   state<T> *s_;
   template <typename... Ts> void set_value(Ts &&... v) {
     {
-      std::unique_lock<std::mutex> lk{s_->m};
+      std::lock_guard<std::mutex> lk{s_->m};
       s_->v_ = {std::forward<Ts>(v)...};
       s_->variant_ = state<T>::Variant::value;
+      // Notify while under the lock to avoid that the waiting thread destroys the condition variable.
+      s_->c.notify_one();
     }
-    s_->c.notify_one();
   }
 };
 
