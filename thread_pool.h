@@ -1,6 +1,7 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
+#include "intrusive_forward_list.h"
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -10,7 +11,7 @@
 
 namespace execution {
 
-struct task_base {
+struct task_base : intrusive_forward_list<task_base>::node {
   void (*execute)(task_base *);
   void run() { (*execute)(this); }
 };
@@ -61,17 +62,17 @@ public:
     c_.notify_all();
   }
 
-  template <typename F> void submit(F &&f) {
+  void submit(task_base &f) {
     {
       std::lock_guard<std::mutex> lk{m_};
-      queue_.emplace(std::forward<F>(f));
+      queue_.push_back(f);
     }
     c_.notify_one();
   }
 
 private:
   bool done_;
-  std::queue<task_base *> queue_;
+  intrusive_forward_list<task_base> queue_;
   std::vector<join_thread> threads_;
 
   mutable std::mutex m_;
@@ -86,8 +87,8 @@ private:
         if (done_) {
           break;
         }
-        task = std::move(queue_.front());
-        queue_.pop();
+        task = &queue_.front();
+        queue_.pop_front();
       }
 
       task->run();
@@ -100,9 +101,10 @@ private:
 template <typename P> class task : public task_base {
 public:
   template <typename U>
-  task(U &&p, detail::thread_pool &scheduler) : task_base{&task::impl}, p_{std::forward<U>(p)}, scheduler_{scheduler} {}
+  task(U &&p, detail::thread_pool &scheduler)
+      : task_base{{}, &task::impl}, p_{std::forward<U>(p)}, scheduler_{scheduler} {}
 
-  void start() { scheduler_.submit(this); }
+  void start() { scheduler_.submit(*this); }
 
 private:
   static void impl(task_base *const b) {

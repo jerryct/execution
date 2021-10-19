@@ -45,6 +45,7 @@ add_subdirectory(../googletest _build/googletest)
 add_library(execution
   dummy.cpp
   execution.h
+  intrusive_forward_list.h
   invoke_traits.h
   sync_wait.h
   thread_pool.h
@@ -57,6 +58,7 @@ target_link_libraries(execution PUBLIC Threads::Threads)
 target_compile_options(execution PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wformat=2" "-Wconversion")
 
 add_executable(unit_tests
+  intrusive_forward_list_tests.cpp
   invoke_traits_tests.cpp
   then_tests.cpp
 )

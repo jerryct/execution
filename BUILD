@@ -2,6 +2,7 @@ cc_library(
     name = "execution",
     srcs = [
         "dummy.cpp",
+        "intrusive_forward_list.h",
         "invoke_traits.h",
         "sync_wait.h",
         "thread_pool.h",
@@ -17,6 +18,7 @@ cc_library(
 cc_test(
     name = "test",
     srcs = [
+        "intrusive_forward_list_tests.cpp",
         "invoke_traits_tests.cpp",
         "then_tests.cpp",
     ],
