@@ -43,6 +43,7 @@ find_package(Threads REQUIRED)
 add_subdirectory(../googletest _build/googletest)
 
 add_library(execution
+  bulk.h
   dummy.cpp
   execution.h
   intrusive_forward_list.h
@@ -58,6 +59,7 @@ target_link_libraries(execution PUBLIC Threads::Threads)
 target_compile_options(execution PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wformat=2" "-Wconversion")
 
 add_executable(unit_tests
+  bulk_tests.cpp
   intrusive_forward_list_tests.cpp
   invoke_traits_tests.cpp
   then_tests.cpp

@@ -4,6 +4,7 @@
 #define INTRUSIVE_FORWARD_LIST_H
 
 #include <cstddef>
+#include <iostream>
 
 namespace execution {
 
@@ -24,6 +25,9 @@ public:
   constexpr const_reference front() const { return *static_cast<T *>(before_begin.next); }
 
   constexpr void push_back(reference d) {
+    if (d.next || &d == last)
+      std::cout << "double push" << std::endl;
+
     last->next = &d;
     last = last->next;
     last->next = nullptr;

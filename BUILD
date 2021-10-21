@@ -1,6 +1,7 @@
 cc_library(
     name = "execution",
     srcs = [
+        "bulk.h",
         "dummy.cpp",
         "intrusive_forward_list.h",
         "invoke_traits.h",
@@ -18,6 +19,7 @@ cc_library(
 cc_test(
     name = "test",
     srcs = [
+        "bulk_tests.cpp",
         "intrusive_forward_list_tests.cpp",
         "invoke_traits_tests.cpp",
         "then_tests.cpp",
