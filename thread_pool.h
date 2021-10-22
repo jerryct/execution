@@ -2,6 +2,9 @@
 #define THREAD_POOL_H
 
 #include "intrusive_forward_list.h"
+#ifdef TRACING
+#include "jerryct/tracing/tracing.h"
+#endif
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -17,7 +20,12 @@ struct task_base : intrusive_forward_list<task_base>::node {
   using task = void (*)(task_base *);
   task_base(task v) : intrusive_forward_list<task_base>::node{}, execute{v} {}
   task execute;
-  void run() { (*execute)(this); }
+  void run() {
+#ifdef TRACING
+    jerryct::trace::Span _{jerryct::trace::Tracer(), "task_base run"};
+#endif
+    (*execute)(this);
+  }
 };
 
 } // namespace thread_pool_detail
@@ -44,6 +52,9 @@ class thread_pool {
 
 public:
   thread_pool(const unsigned thread_count = std::thread::hardware_concurrency()) : done_{false} {
+#ifdef TRACING
+    jerryct::trace::Span _{jerryct::trace::Tracer(), "thread pool ctor"};
+#endif
     try {
       for (unsigned i{0}; i < thread_count; ++i) {
         threads_.emplace_back(&thread_pool::worker_thread, this);
@@ -83,11 +94,25 @@ private:
   std::condition_variable c_;
 
   void worker_thread() {
+#ifdef TRACING
+    jerryct::trace::Span _1{jerryct::trace::Tracer(), "worker"};
+#endif
     thread_pool_detail::task_base *task;
     while (true) {
+#ifdef TRACING
+      jerryct::trace::Span _2{jerryct::trace::Tracer(), "worker loop"};
+#endif
       {
+#ifdef TRACING
+        jerryct::trace::Span _3{jerryct::trace::Tracer(), "worker pop"};
+#endif
         std::unique_lock<std::mutex> lk{m_};
-        c_.wait(lk, [this]() { return done_ || !queue_.empty(); });
+        {
+#ifdef TRACING
+          jerryct::trace::Span _3{jerryct::trace::Tracer(), "worker pop wait"};
+#endif
+          c_.wait(lk, [this]() { return done_ || !queue_.empty(); });
+        }
         if (done_) {
           return;
         }
@@ -108,7 +133,12 @@ public:
   template <typename U>
   task(U &&p, thread_pool &scheduler) : task_base{&task::impl}, p_{std::forward<U>(p)}, scheduler_{&scheduler} {}
 
-  void start() { scheduler_->submit(*this); }
+  void start() {
+#ifdef TRACING
+    jerryct::trace::Span _{jerryct::trace::Tracer(), "task start"};
+#endif
+    scheduler_->submit(*this);
+  }
 
 private:
   static void impl(task_base *const b) {

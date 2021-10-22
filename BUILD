@@ -17,6 +17,7 @@ cc_library(
     copts = ["-pthread"],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
+    deps = ["@jerryct_tracer//:tracing"],
 )
 
 cc_test(

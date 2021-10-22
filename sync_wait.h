@@ -8,6 +8,10 @@
 #include <type_traits>
 #include <utility>
 
+#ifdef TRACING
+#include "jerryct/tracing/tracing.h"
+#endif
+
 // template <typename C> std::future<int> async_algo(C &&c) {
 //  std::promise<int> p{};
 //  auto f = p.get_future();
@@ -41,11 +45,19 @@ template <typename T> struct promise {
 };
 
 template <typename Result, typename Sender> auto sync_wait(Sender &&sender) {
+#ifdef TRACING
+  jerryct::trace::Span _1{jerryct::trace::Tracer(), "sync wait"};
+#endif
   using R = std::conditional_t<std::is_void<Result>::value, empty, Result>;
   state<R> st{};
   promise<R> p{&st};
   auto op_state = std::forward<Sender>(sender).connect(std::move(p));
-  op_state.start();
+  {
+#ifdef TRACING
+    jerryct::trace::Span _2{jerryct::trace::Tracer(), "sync wait op state start"};
+#endif
+    op_state.start();
+  }
   {
     std::unique_lock<std::mutex> lk{st.m};
     st.c.wait(lk, [&st]() { return st.variant_ != state<R>::Variant::monostate; });
