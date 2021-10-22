@@ -103,9 +103,9 @@ template <typename P> class task : public task_base {
 public:
   template <typename U>
   task(U &&p, detail::thread_pool &scheduler)
-      : task_base{{}, &task::impl}, p_{std::forward<U>(p)}, scheduler_{scheduler} {}
+      : task_base{{}, &task::impl}, p_{std::forward<U>(p)}, scheduler_{&scheduler} {}
 
-  void start() { scheduler_.submit(*this); }
+  void start() { scheduler_->submit(*this); }
 
 private:
   static void impl(task_base *const b) {
@@ -114,7 +114,7 @@ private:
   };
 
   P p_;
-  detail::thread_pool &scheduler_;
+  detail::thread_pool *scheduler_;
 };
 
 inline auto schedule(detail::thread_pool &scheduler) {
