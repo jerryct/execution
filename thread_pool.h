@@ -85,7 +85,7 @@ private:
         std::unique_lock<std::mutex> lk{m_};
         c_.wait(lk, [this]() { return done_ || !queue_.empty(); });
         if (done_) {
-          break;
+          return;
         }
         task = &queue_.front();
         queue_.pop_front();
@@ -93,6 +93,7 @@ private:
 
       task->run();
     }
+    std::abort();
   }
 };
 
