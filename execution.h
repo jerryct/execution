@@ -36,13 +36,14 @@ template <typename P, typename F> struct Receiver {
 template <typename Sender, typename Invocable> auto then(Sender input, Invocable function) {
   return [input, function](auto p) { return input(Receiver<decltype(p), Invocable>{std::move(p), function}); };
 }
-
-template <typename Sender, typename Invocable> auto operator|(Sender &&input, Invocable &&function) {
-  return then(std::forward<Sender>(input), std::forward<Invocable>(function));
+template <typename Invocable> auto then(Invocable function) {
+  return [function](auto sender) {
+    return [sender, function](auto p) { return sender(Receiver<decltype(p), Invocable>{std::move(p), function}); };
+  };
 }
 
-template <typename Ts> auto just(Ts v) {
-  return [v]() { return v; };
+template <typename Sender, typename Invocable> auto operator|(Sender &&sender, Invocable &&function) {
+  return std::forward<Invocable>(function)(std::forward<Sender>(sender));
 }
 
 } // namespace execution

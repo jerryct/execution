@@ -80,7 +80,7 @@ template <typename Sender, typename Invocable> auto bulk(Sender sender, int i, I
 }
 template <typename Invocable> auto bulk(int i, Invocable function) {
   return [i, function](auto sender) {
-    bulk_detail::Sender<decltype(sender), Invocable>{std::move(sender), function, i};
+    return bulk_detail::Sender<decltype(sender), Invocable>{std::move(sender), function, i};
   };
 }
 

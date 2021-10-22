@@ -35,7 +35,8 @@ TEST(then, continuation_with_nested_function_calls) {
 
 TEST(pipe, pipe) {
   detail::thread_pool pool{1};
-  auto s = schedule(pool) | []() { return 42; } | [](int v) { return v + 1; } | [](int v) { return v + 1; };
+  auto s = schedule(pool) | then([]() { return 42; }) | then([](int v) { return v + 1; }) |
+           then([](int v) { return v + 1; });
   EXPECT_EQ(44, this_thread::sync_wait<int>(s));
 }
 
@@ -50,14 +51,8 @@ TEST(pipe, non_copyble) {
   };
 
   detail::thread_pool pool{1};
-  auto s = schedule(pool) | []() -> NonCopyable { return {}; } | [](NonCopyable v) { return v; };
+  auto s = schedule(pool) | then([]() -> NonCopyable { return {}; }) | then([](NonCopyable v) { return v; });
   EXPECT_EQ(42, this_thread::sync_wait<NonCopyable>(s).v);
-}
-
-TEST(just, just) {
-  detail::thread_pool pool{1};
-  auto s = schedule(pool) | just(42) | [](int v) { return v + 1; } | [](int v) { return v + 1; };
-  EXPECT_EQ(44, this_thread::sync_wait<int>(s));
 }
 
 TEST(new_thread, new_thread) {
@@ -69,7 +64,7 @@ TEST(new_thread, new_thread) {
 TEST(then, void_return) {
   int v = 23;
   detail::thread_pool pool{1};
-  auto s = schedule(pool) | [&v]() { v = 42; };
+  auto s = schedule(pool) | then([&v]() { v = 42; });
   this_thread::sync_wait<void>(s);
   EXPECT_EQ(42, v);
 }
@@ -77,7 +72,7 @@ TEST(then, void_return) {
 TEST(then, multiple_invocations) {
   int v = 0;
   detail::thread_pool pool{1};
-  auto s = schedule(pool) | [&v]() { v += 1; };
+  auto s = schedule(pool) | then([&v]() { v += 1; });
   this_thread::sync_wait<void>(s);
   EXPECT_EQ(1, v);
   this_thread::sync_wait<void>(s);
