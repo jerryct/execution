@@ -14,11 +14,13 @@ template <typename P> struct task {
   void start() { p_.set_value(); }
 };
 
+struct Sender {
+  template <typename P> auto operator()(P p) const { return task<decltype(p)>{std::move(p)}; }
+};
+
 } // namespace inline_task_detail
 
-inline auto schedule() {
-  return [](auto p) { return inline_task_detail::task<decltype(p)>{std::move(p)}; };
-}
+inline auto schedule() { return inline_task_detail::Sender{}; }
 
 } // namespace execution
 

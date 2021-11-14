@@ -120,11 +120,15 @@ private:
   thread_pool *scheduler_;
 };
 
+struct Sender {
+  thread_pool &scheduler;
+
+  template <typename P> auto operator()(P p) const { return task<decltype(p)>{std::move(p), scheduler}; };
+};
+
 } // namespace thread_pool_detail
 
-inline auto schedule(thread_pool &scheduler) {
-  return [&scheduler](auto p) { return thread_pool_detail::task<decltype(p)>{std::move(p), scheduler}; };
-}
+inline auto schedule(thread_pool &scheduler) { return thread_pool_detail::Sender{scheduler}; }
 
 } // namespace execution
 
