@@ -11,6 +11,8 @@
 
 namespace execution {
 
+namespace thread_pool_detail {
+
 struct task_base : intrusive_forward_list<task_base>::node {
   using task = void (*)(task_base *);
   task_base(task v) : intrusive_forward_list<task_base>::node{}, execute{v} {}
@@ -18,7 +20,7 @@ struct task_base : intrusive_forward_list<task_base>::node {
   void run() { (*execute)(this); }
 };
 
-namespace detail {
+} // namespace thread_pool_detail
 
 class thread_pool {
   struct join_thread {
@@ -64,7 +66,7 @@ public:
     c_.notify_all();
   }
 
-  void submit(task_base &f) {
+  void submit(thread_pool_detail::task_base &f) {
     {
       std::lock_guard<std::mutex> lk{m_};
       queue_.push_back(f);
@@ -74,14 +76,14 @@ public:
 
 private:
   bool done_;
-  intrusive_forward_list<task_base> queue_;
+  intrusive_forward_list<thread_pool_detail::task_base> queue_;
   std::vector<join_thread> threads_;
 
   mutable std::mutex m_;
   std::condition_variable c_;
 
   void worker_thread() {
-    task_base *task;
+    thread_pool_detail::task_base *task;
     while (true) {
       {
         std::unique_lock<std::mutex> lk{m_};
@@ -99,13 +101,12 @@ private:
   }
 };
 
-} // namespace detail
+namespace thread_pool_detail {
 
 template <typename P> class task : public task_base {
 public:
   template <typename U>
-  task(U &&p, detail::thread_pool &scheduler)
-      : task_base{&task::impl}, p_{std::forward<U>(p)}, scheduler_{&scheduler} {}
+  task(U &&p, thread_pool &scheduler) : task_base{&task::impl}, p_{std::forward<U>(p)}, scheduler_{&scheduler} {}
 
   void start() { scheduler_->submit(*this); }
 
@@ -116,11 +117,13 @@ private:
   };
 
   P p_;
-  detail::thread_pool *scheduler_;
+  thread_pool *scheduler_;
 };
 
-inline auto schedule(detail::thread_pool &scheduler) {
-  return [&scheduler](auto p) { return task<decltype(p)>{std::move(p), scheduler}; };
+} // namespace thread_pool_detail
+
+inline auto schedule(thread_pool &scheduler) {
+  return [&scheduler](auto p) { return thread_pool_detail::task<decltype(p)>{std::move(p), scheduler}; };
 }
 
 } // namespace execution

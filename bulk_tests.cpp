@@ -16,7 +16,7 @@ TEST(bulk, continuation_with_named_temporaries) {
     EXPECT_EQ(42, r);
   }
 
-  detail::thread_pool pool{8};
+  thread_pool pool{8};
   auto s1 = then(schedule(pool), []() { return 23; });
   auto s2 = bulk(s1, v.size(), [&v](const int i, const int m) { v[i] = m; });
   this_thread::sync_wait<int>(s2);
@@ -32,7 +32,7 @@ TEST(bulk, continuation_with_nested_function_calls) {
     EXPECT_EQ(42, r);
   }
 
-  detail::thread_pool pool{8};
+  thread_pool pool{8};
   auto s = bulk(then(schedule(pool), []() { return 23; }), v.size(), [&v](const int i, const int m) { v[i] = m; });
   this_thread::sync_wait<int>(s);
 
@@ -47,7 +47,7 @@ TEST(bulk, continuation_with_pipe) {
     EXPECT_EQ(42, r);
   }
 
-  detail::thread_pool pool{8};
+  thread_pool pool{8};
   auto s = schedule(pool) | then([]() { return 23; }) | bulk(v.size(), [&v](const int i, const int m) { v[i] = m; });
   this_thread::sync_wait<int>(s);
 

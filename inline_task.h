@@ -7,13 +7,17 @@
 
 namespace execution {
 
-template <typename P> struct inline_task {
+namespace inline_task_detail {
+
+template <typename P> struct task {
   P p_;
   void start() { p_.set_value(); }
 };
 
+} // namespace inline_task_detail
+
 inline auto schedule() {
-  return [](auto p) { return inline_task<decltype(p)>{std::move(p)}; };
+  return [](auto p) { return inline_task_detail::task<decltype(p)>{std::move(p)}; };
 }
 
 } // namespace execution
