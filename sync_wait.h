@@ -44,7 +44,7 @@ template <typename Result, typename Sender> auto sync_wait(Sender &&sender) {
   using R = std::conditional_t<std::is_void<Result>::value, empty, Result>;
   state<R> st{};
   promise<R> p{&st};
-  auto op_state = std::forward<Sender>(sender)(std::move(p));
+  auto op_state = std::forward<Sender>(sender).connect(std::move(p));
   op_state.start();
   {
     std::unique_lock<std::mutex> lk{st.m};

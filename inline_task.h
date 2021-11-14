@@ -15,7 +15,7 @@ template <typename P> struct task {
 };
 
 struct Sender {
-  template <typename P> auto operator()(P p) const { return task<decltype(p)>{std::move(p)}; }
+  template <typename P> auto connect(P p) const { return task<decltype(p)>{std::move(p)}; }
 };
 
 } // namespace inline_task_detail

@@ -123,7 +123,7 @@ private:
 struct Sender {
   thread_pool &scheduler;
 
-  template <typename P> auto operator()(P p) const { return task<decltype(p)>{std::move(p), scheduler}; };
+  template <typename P> auto connect(P p) const { return task<decltype(p)>{std::move(p), scheduler}; };
 };
 
 } // namespace thread_pool_detail

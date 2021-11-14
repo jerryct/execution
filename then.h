@@ -29,7 +29,7 @@ template <typename S, typename F> struct Sender {
   S s_;
   F f_;
 
-  template <typename P> auto operator()(P p) const { return s_(Receiver<decltype(p), F>{std::move(p), f_}); }
+  template <typename P> auto connect(P p) const { return s_.connect(Receiver<decltype(p), F>{std::move(p), f_}); }
 };
 
 } // namespace then_detail

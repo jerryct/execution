@@ -59,14 +59,14 @@ template <typename S, typename F> struct Sender {
   F function;
   int max_;
 
-  template <typename P> auto operator()(P p) const {
+  template <typename P> auto connect(P p) const {
     p.s_->v_ = max_;
 
-    using O = decltype(sender(Receiver<latch, F>{latch{p.s_}, function, 0}));
+    using O = decltype(sender.connect(Receiver<latch, F>{latch{p.s_}, function, 0}));
     Operation<O> op;
     op.v.reserve(max_);
     for (int i = 0; i < max_; ++i) {
-      op.v.push_back(sender(Receiver<latch, F>{latch{p.s_}, function, i}));
+      op.v.push_back(sender.connect(Receiver<latch, F>{latch{p.s_}, function, i}));
     }
     return op;
   }
