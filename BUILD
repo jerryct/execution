@@ -6,6 +6,7 @@ cc_library(
         "intrusive_forward_list.h",
         "invoke_traits.h",
         "sync_wait.h",
+        "then.h",
         "thread_pool.h",
     ],
     hdrs = [

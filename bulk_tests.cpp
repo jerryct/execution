@@ -3,6 +3,7 @@
 #include "bulk.h"
 #include "execution.h"
 #include "sync_wait.h"
+#include "then.h"
 #include <gtest/gtest.h>
 
 namespace execution {

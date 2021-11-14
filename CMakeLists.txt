@@ -49,6 +49,7 @@ add_library(execution
   intrusive_forward_list.h
   invoke_traits.h
   sync_wait.h
+  then.h
   thread_pool.h
 )
 target_include_directories(execution PUBLIC
