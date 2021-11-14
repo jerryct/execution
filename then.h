@@ -35,10 +35,12 @@ template <typename S, typename F> struct Sender {
 } // namespace then_detail
 
 template <typename Sender, typename Invocable> auto then(Sender sender, Invocable function) {
-  return then_detail::Sender<Sender, Invocable>{sender, function};
+  return then_detail::Sender<Sender, Invocable>{std::move(sender), std::move(function)};
 }
 template <typename Invocable> auto then(Invocable function) {
-  return [function](auto sender) { return then_detail::Sender<decltype(sender), Invocable>{sender, function}; };
+  return [function](auto sender) {
+    return then_detail::Sender<decltype(sender), Invocable>{std::move(sender), function};
+  };
 }
 
 template <typename Sender, typename Invocable> auto operator|(Sender &&sender, Invocable &&function) {

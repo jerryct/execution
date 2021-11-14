@@ -75,7 +75,7 @@ template <typename S, typename F> struct Sender {
 } // namespace bulk_detail
 
 template <typename Sender, typename Invocable> auto bulk(Sender sender, int i, Invocable function) {
-  return bulk_detail::Sender<Sender, Invocable>{sender, function, i};
+  return bulk_detail::Sender<Sender, Invocable>{std::move(sender), std::move(function), i};
 }
 template <typename Invocable> auto bulk(int i, Invocable function) {
   return [i, function](auto sender) {
