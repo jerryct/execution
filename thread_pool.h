@@ -123,4 +123,4 @@ inline auto schedule(detail::thread_pool &scheduler) {
 
 } // namespace execution
 
-#endif
+#endif // THREAD_POOL_H

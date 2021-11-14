@@ -46,6 +46,7 @@ add_library(execution
   bulk.h
   dummy.cpp
   execution.h
+  inline_task.h
   intrusive_forward_list.h
   invoke_traits.h
   sync_wait.h

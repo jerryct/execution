@@ -3,6 +3,7 @@ cc_library(
     srcs = [
         "bulk.h",
         "dummy.cpp",
+        "inline_task.h",
         "intrusive_forward_list.h",
         "invoke_traits.h",
         "sync_wait.h",

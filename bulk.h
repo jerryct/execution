@@ -5,7 +5,6 @@
 
 #include "invoke_traits.h"
 #include "sync_wait.h"
-#include "thread_pool.h"
 #include <type_traits>
 #include <utility>
 #include <vector>

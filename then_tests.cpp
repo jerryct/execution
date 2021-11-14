@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-#include "execution.h"
+#include "inline_task.h"
 #include "sync_wait.h"
 #include "then.h"
+#include "thread_pool.h"
 #include <gtest/gtest.h>
+#include <thread>
 
 namespace execution {
 namespace {

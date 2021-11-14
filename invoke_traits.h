@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-#ifndef TYPE_TRAITS_H
-#define TYPE_TRAITS_H
+#ifndef INVOKE_TRAITS_H
+#define INVOKE_TRAITS_H
 
 #include <type_traits>
 #include <utility>
@@ -34,4 +34,4 @@ template <typename F, typename... Args> using invoke_result_t = typename invoke_
 
 } // namespace execution
 
-#endif // TYPE_TRAITS_H
+#endif // INVOKE_TRAITS_H
