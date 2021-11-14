@@ -12,7 +12,9 @@
 namespace execution {
 
 struct task_base : intrusive_forward_list<task_base>::node {
-  void (*execute)(task_base *);
+  using task = void (*)(task_base *);
+  task_base(task v) : intrusive_forward_list<task_base>::node{}, execute{v} {}
+  task execute;
   void run() { (*execute)(this); }
 };
 
@@ -103,7 +105,7 @@ template <typename P> class task : public task_base {
 public:
   template <typename U>
   task(U &&p, detail::thread_pool &scheduler)
-      : task_base{{}, &task::impl}, p_{std::forward<U>(p)}, scheduler_{&scheduler} {}
+      : task_base{&task::impl}, p_{std::forward<U>(p)}, scheduler_{&scheduler} {}
 
   void start() { scheduler_->submit(*this); }
 

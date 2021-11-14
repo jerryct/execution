@@ -8,11 +8,12 @@ namespace {
 
 TEST(intrusive_forward_list, again) {
   struct data : intrusive_forward_list<data>::node {
+    data(int v) : intrusive_forward_list<data>::node{}, x{v} {}
     int x;
   };
 
-  data a{{}, 23};
-  data b{{}, 42};
+  data a{23};
+  data b{42};
 
   intrusive_forward_list<data> q;
   EXPECT_TRUE(q.empty());
@@ -34,12 +35,13 @@ TEST(intrusive_forward_list, again) {
 
 TEST(intrusive_forward_list, intr) {
   struct data : intrusive_forward_list<data>::node {
+    data(int v) : intrusive_forward_list<data>::node{}, x{v} {}
     int x;
   };
 
-  data a{{}, 23};
-  data b{{}, 42};
-  data c{{}, 73};
+  data a{23};
+  data b{42};
+  data c{73};
 
   intrusive_forward_list<data> q;
   EXPECT_TRUE(q.empty());
